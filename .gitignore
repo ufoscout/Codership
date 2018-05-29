@@ -1,12 +1,28 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# Go
+**/.idea
+**/*.iml
 
-# Test binary, build with `go test -c`
-*.test
+**/*.exe
 
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+**/vendor
+**/target
+
+# Executables
+Go-GinGonic
+main
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

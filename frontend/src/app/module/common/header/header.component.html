@@ -1,0 +1,53 @@
+<div>
+  <header class="navbar navbar-light bg-light navbar-expand-lg">
+
+    <a class="navbar-brand" [routerLink]="['/']" (click)="navbarCollapsed = true">WeWeb</a>
+
+    <button class="navbar-toggler navbar-toggler-right" type="button" (click)="navbarCollapsed = !navbarCollapsed" [attr.aria-expanded]="!navbarCollapsed"
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="navbar-collapse" [ngbCollapse]="navbarCollapsed" id="navbarContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/login']" (click)="navbarCollapsed = true">Login</a>
+        </li>
+        <li ngbDropdown class="nav-item dropdown">
+          <div class="nav-link dropdown-toggle" data-toggle="dropdown" ngbDropdownToggle id="dropdownLanguage">
+            {{(commonState$ | async).language}}
+            <span class="caret"></span>
+          </div>
+          <div ngbDropdownMenu aria-labelledby="dropdownLanguage" id="dropdownLanguages">
+            <div class="dropdown-item" *ngFor="let lang of (commonState$ | async).allLanguages" (click)="setLanguage(lang)">
+              {{lang}}
+            </div>
+          </div>
+        </li>
+        <!--
+              <li class="nav-item" [routerLinkActive]="['active']">
+                <a class="nav-link" [routerLink]="['/components']" (click)="navbarCollapsed = true">Components</a>
+              </li>
+            -->
+      </ul>
+
+      <!--
+            <span class="github-buttons d-none d-lg-inline">
+              <a class="github-button"
+                 href="https://github.com/ng-bootstrap/ng-bootstrap"
+                 target="_blank"
+                 data-size="large"
+                 data-show-count="true"
+                 data-count-aria-label="# stargazers on GitHub"
+                 aria-label="Star ng-bootstrap/ng-bootstrap on GitHub">Star</a>
+              <a href="https://twitter.com/intent/tweet?button_hashtag=ngbootstrap"
+                 class="twitter-hashtag-button"
+                 data-size="large"
+                 data-text="I&#39;m checking out ng-bootstrap, THE Angular UI framework for Bootstrap CSS"
+                 data-url="https://ng-bootstrap.github.io"
+                 data-show-count="true">Tweet #ngbootstrap</a>
+            </span>
+          -->
+    </div>
+  </header>
+</div>
