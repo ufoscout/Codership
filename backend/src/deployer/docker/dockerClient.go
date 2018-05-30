@@ -11,7 +11,53 @@ import (
 
 	"strconv"
 	"strings"
+	"docker.io/go-docker/api/types/container"
+	"io"
+	"os"
 )
+
+func StartImage() {
+		ctx := context.Background()
+		cli, err := docker.NewEnvClient()
+		if err != nil {
+			panic(err)
+		}
+
+		pull, err := cli.ImagePull(ctx, "alpine:3.6", types.ImagePullOptions{})
+		if err != nil {
+			panic(err)
+		} else {
+			io.Copy(os.Stdout, pull)
+		}
+
+		resp, err := cli.ContainerCreate(ctx, &container.Config{
+			Image: "alpine:3.6",
+			Cmd:   []string{"echo", "hello world"},
+		}, nil, nil, "")
+		if err != nil {
+			panic(err)
+		}
+
+		if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+			panic(err)
+		}
+
+		statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+		select {
+		case err := <-errCh:
+			if err != nil {
+				panic(err)
+			}
+		case <-statusCh:
+		}
+
+		out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+		if err != nil {
+			panic(err)
+		}
+
+		io.Copy(os.Stdout, out)
+}
 
 func Images() {
 
