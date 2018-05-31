@@ -94,8 +94,8 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
 	_check_config "$@"
 	# Get config
 	DATADIR="$(_get_config 'datadir' "$@")"
-
-	if [ ! -d "$DATADIR/mysql" ]; then
+ 
+	if [ ! -n "$SKIP_DB_INIT" ]; then
 		file_env 'MYSQL_ROOT_PASSWORD'
 		if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" -a -z "$MYSQL_RANDOM_ROOT_PASSWORD" ]; then
 			echo >&2 'error: database is uninitialized and password option is not specified '
@@ -106,7 +106,7 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
 		mkdir -p "$DATADIR"
 
 		echo 'Initializing database'
-		"$@" --initialize-insecure
+		#"$@" --initialize-insecure
 		echo 'Database initialized'
 
 		if command -v mysql_ssl_rsa_setup > /dev/null && [ ! -e "$DATADIR/server-key.pem" ]; then

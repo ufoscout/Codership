@@ -36,5 +36,5 @@ EXPOSE 3306 4444 4567 4567/udp 4568
 
 COPY my.cnf /etc/mysql/my.cnf
 
-#ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["mysqld"]

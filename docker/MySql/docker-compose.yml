@@ -8,6 +8,18 @@ services:
     hostname: node1
     ports:
       - "3306:3306"
+     # - "4444:4444"
+     # - "4567:4567"
+     # - "4568:4568"
+    environment:
+      MYSQL_INITDB_SKIP_TZINFO: 1
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      WSREP_NODE_NAME: node1
+      WSREP_CLUSTER_NAME: galera_cluster
+      WSREP_CLUSTER_ADDRESS: gcomm://node1,node2
     command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://
    
   node2:
@@ -15,6 +27,19 @@ services:
     hostname: node2
     ports:
       - "3307:3306"
+     # - "4444:4444"
+     # - "4567:4567"
+     # - "4568:4568"
+    environment:
+      SKIP_DB_INIT: 1
+      MYSQL_INITDB_SKIP_TZINFO: 1
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      WSREP_NODE_NAME: node2
+      WSREP_CLUSTER_NAME: galera_cluster
+      WSREP_CLUSTER_ADDRESS: gcomm://node1,node2
     command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://node1
 
   node3:

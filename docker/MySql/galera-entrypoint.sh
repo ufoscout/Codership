@@ -4,14 +4,6 @@
 
 set -eo pipefail
 
-# Workaround to skip mysql db initialization.
-# It looks like the only way is to create an empty /var/lib/mysql/mysql directory! 
-# That's completely crazy. it took me hours to figure it out...
-if [ -n "$SKIP_DB_INIT" ]; then
-	echo 'SKIP DB INIT TRUE'
-	mkdir -p /var/lib/mysql/mysql
-fi
-
 rm -rf /etc/mysql/my.cnf
 touch /etc/mysql/my.cnf
 
