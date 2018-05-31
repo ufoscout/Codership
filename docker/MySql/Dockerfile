@@ -34,7 +34,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 3306 4444 4567 4567/udp 4568
 
-COPY my.cnf /etc/mysql/my.cnf
+ENV MYSQL_INITDB_SKIP_TZINFO 1
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/galera-entrypoint.sh"]
 CMD ["mysqld"]

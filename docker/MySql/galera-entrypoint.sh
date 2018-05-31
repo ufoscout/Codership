@@ -15,18 +15,21 @@ if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'mysqld' ]; then
 
 	cat <<- EOF > /etc/mysql/my.cnf
 	[mysqld]
+	user="mysql"
 	bind-address="0.0.0.0"
+	default_storage_engine="innodb"
 	binlog_format="row"
-	default_storage_engine="InnoDB"
 	innodb_autoinc_lock_mode="2"
+	innodb_flush_log_at_trx_commit="0"
+	skip-external-locking
 	innodb_locks_unsafe_for_binlog="1"
 	wsrep_on="on"
-	wsrep_provider="${WSREP_PROVIDER:-/usr/lib/libgalera_smm.so}"
+	wsrep_provider="${WSREP_PROVIDER:-/usr/lib/galera/libgalera_smm.so}"
 	wsrep_provider_options="${WSREP_PROVIDER_OPTIONS}"
 	wsrep_cluster_address="${WSREP_CLUSTER_ADDRESS}"
 	wsrep_cluster_name="${WSREP_CLUSTER_NAME:-my_wsrep_cluster}"
 	wsrep_node_name="${WSREP_NODE_NAME:-$(hostname -s)}"
-	wsrep_sst_auth="${WSREP_SST_AUTH}"
+	wsrep_sst_auth="${WSREP_SST_AUTH:-secretKey}"
 	wsrep_sst_method="${WSREP_SST_METHOD:-rsync}"
 	EOF
 
