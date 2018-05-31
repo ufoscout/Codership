@@ -13,10 +13,21 @@ RUN add-apt-repository 'deb http://releases.galeracluster.com/mysql-wsrep-5.7/ub
 RUN apt-get update
 RUN apt-get install -y galera-3 galera-arbitrator-3 mysql-wsrep-5.7 && rm -rf /var/lib/apt/lists/*
 
+ENV GOSU_VERSION 1.7
+RUN set -x \
+	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+	&& export GNUPGHOME="$(mktemp -d)" \
+	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu \
+	&& gosu nobody true 
+	
+RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
+
 COPY galera-entrypoint.sh /
 RUN chmod +x /galera-entrypoint.sh
-
-RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
@@ -25,5 +36,5 @@ EXPOSE 3306 4444 4567 4567/udp 4568
 
 COPY my.cnf /etc/mysql/my.cnf
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+#ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["mysqld"]
