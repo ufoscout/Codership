@@ -19,7 +19,7 @@ services:
       WSREP_NODE_NAME: node1
       WSREP_CLUSTER_NAME: galera_cluster
       WSREP_CLUSTER_ADDRESS: gcomm://
-    command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://
+    #command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://
    
   node2:
     image: "codership/galera-mysql:5.7"
@@ -38,7 +38,7 @@ services:
       WSREP_NODE_NAME: node2
       WSREP_CLUSTER_NAME: galera_cluster
       WSREP_CLUSTER_ADDRESS: gcomm://node1
-    command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://node1
+    #command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://node1
 
   node3:
     image: "codership/galera-mysql:5.7"
@@ -57,4 +57,4 @@ services:
       WSREP_NODE_NAME: node3
       WSREP_CLUSTER_NAME: galera_cluster
       WSREP_CLUSTER_ADDRESS: gcomm://node1
-    command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://node1    
+    #command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://node1    
