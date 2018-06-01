@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/ufoscout/Codership/backend/src/core/configuration"
+	"github.com/ufoscout/Codership/backend/src/configuration"
 	"github.com/ufoscout/Codership/backend/src/util"
 )
 

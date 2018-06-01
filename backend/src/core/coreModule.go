@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/ufoscout/Codership/backend/src/core/configuration"
+	"github.com/ufoscout/Codership/backend/src/configuration"
 
 	"context"
 	"log"

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 PROJECT_NAME=backend
-BUILD_TARGET_PATH=./target
-BUILD_TARGET_FILE=server
+BUILD_TARGET_PATH=.
+BUILD_TARGET_FILE=backend
 
 declare -a steps=(
-  "rm -rf ${BUILD_TARGET_PATH}"
+  #"rm -rf ${BUILD_TARGET_PATH}"
   "vgo test ./..."
   "vgo build -o ${BUILD_TARGET_PATH}/${BUILD_TARGET_FILE}"
 )

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/ufoscout/Codership/backend/src/core"
-	"github.com/ufoscout/Codership/backend/src/core/configuration"
+	"github.com/ufoscout/Codership/backend/src/configuration"
 	)
 
 func main() {

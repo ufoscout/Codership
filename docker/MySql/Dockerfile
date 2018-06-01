@@ -26,6 +26,9 @@ RUN set -x \
 	
 RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
 
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
+RUN chmod +x /wait
+
 COPY galera-entrypoint.sh /
 RUN chmod +x /galera-entrypoint.sh
 
@@ -37,4 +40,4 @@ EXPOSE 3306 4444 4567 4567/udp 4568
 ENV MYSQL_INITDB_SKIP_TZINFO 1
 
 ENTRYPOINT ["/galera-entrypoint.sh"]
-CMD ["mysqld"]
+CMD /wait && mysqld

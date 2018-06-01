@@ -3,14 +3,14 @@ version: "3"
 services:
 
   node1:
-    image: "codership/galera-mysql:5.7"
-    build: .
+    image: "ufoscout/galera-mysql:latest"
+    #build: .
     hostname: node1
     ports:
       - 3306:3306
-     # - "4444:4444"
-     # - "4567:4567"
-     # - "4568:4568"
+     # - 4444:4444
+     # - 4567:4567
+     # - 4568:4568
     environment:
       WSREP_NEW_CLUSTER: 1
       MYSQL_ROOT_PASSWORD: test
@@ -20,14 +20,14 @@ services:
       WSREP_NODE_NAME: node1
       WSREP_CLUSTER_NAME: galera_cluster
       WSREP_CLUSTER_ADDRESS: gcomm://
-    #command: mysqld --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://
    
   node2:
-    image: "codership/galera-mysql:5.7"
+    image: "ufoscout/galera-mysql:latest"
     hostname: node2
     ports:
       - 3307:3306
     environment:
+      WAIT_HOSTS: node1:3306
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test
       MYSQL_USER: test
@@ -37,11 +37,12 @@ services:
       WSREP_CLUSTER_ADDRESS: gcomm://node1
 
   node3:
-    image: "codership/galera-mysql:5.7"
+    image: "ufoscout/galera-mysql:latest"
     hostname: node3
     ports:
       - 3308:3306
     environment:
+      WAIT_HOSTS: node1:3306
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test
       MYSQL_USER: test
