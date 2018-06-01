@@ -7,14 +7,97 @@ import (
 	"docker.io/go-docker"
 	"golang.org/x/net/context"
 
-	//"html"
-
 	"strconv"
 	"strings"
 	"docker.io/go-docker/api/types/container"
 	"io"
 	"os"
+		"github.com/ufoscout/Codership/backend/src/configuration"
+	"github.com/docker/go-connections/nat"
+	"github.com/ufoscout/Codership/backend/src/deployer/common"
 )
+
+type dockerClient struct {
+	dockerConfig configuration.DockerConfig
+}
+
+func NewDockerDeployer(dockerConfig configuration.DockerConfig) common.Deployer {
+	return &dockerClient{
+		dockerConfig: dockerConfig,
+	}
+}
+
+func (d *dockerClient) DeployCluster(clusterName string, dbType string, instances int) (bool, error) {
+	ctx := context.Background()
+	cli, err := docker.NewEnvClient()
+
+	dockerImage := d.dockerConfig.MariaDbImage
+	if ("mysql" == dbType) {
+		dockerImage = d.dockerConfig.MySqlImage
+	}
+
+	pull, err := cli.ImagePull(ctx, dockerImage, types.ImagePullOptions{})
+	if err != nil {
+		return false, err
+	} else {
+		io.Copy(os.Stdout, pull)
+	}
+
+	hostConfig := &container.HostConfig{
+		PortBindings: nat.PortMap{
+			"3306/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "3306",	},},
+		},
+	}
+
+	resp, err := cli.ContainerCreate(ctx, &container.Config{
+		Image: dockerImage,
+		//Cmd:   []string{"echo", "hello world"},
+		ExposedPorts: nat.PortSet{
+			nat.Port("3306/tcp"): {},
+			//nat.Port("10001/tcp"): {},
+		},
+		Env: []string{
+			"WSREP_NEW_CLUSTER=1",
+			"MYSQL_ROOT_PASSWORD=test",
+			"MYSQL_DATABASE=test",
+			"MYSQL_USER=test",
+			"MYSQL_PASSWORD=test",
+			"WSREP_NODE_NAME=node1",
+			"WSREP_CLUSTER_NAME=galera_cluster",
+			"WSREP_CLUSTER_ADDRESS=gcomm://node1",
+		},
+	}, hostConfig, nil, "")
+	if err != nil {
+		return false, err
+	}
+
+	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+		return false, err
+	}
+/*
+	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			return false, err
+		}
+	case <-statusCh:
+	}
+*/
+	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	if err != nil {
+		return false, err
+	}
+
+	io.Copy(os.Stdout, out)
+
+	return true, nil
+}
+
+func (d *dockerClient) RemoveCluster(clusterName string) (bool, error) {
+	return true, nil
+}
+
 
 func StartImage() {
 		ctx := context.Background()
