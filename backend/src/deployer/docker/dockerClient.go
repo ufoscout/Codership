@@ -27,7 +27,7 @@ func NewDockerDeployer(dockerConfig configuration.DockerConfig) common.Deployer 
 	}
 }
 
-func (d *dockerClient) DeployCluster(clusterName string, dbType string, instances int) (bool, error) {
+func (d *dockerClient) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]string, error) {
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 
@@ -38,15 +38,44 @@ func (d *dockerClient) DeployCluster(clusterName string, dbType string, instance
 
 	pull, err := cli.ImagePull(ctx, dockerImage, types.ImagePullOptions{})
 	if err != nil {
-		return false, err
+		return nil, err
 	} else {
 		io.Copy(os.Stdout, pull)
 	}
 
+	ids := []string{}
+	for i := 0; i < clusterSize; i++ {
+		id, err := d.startNode(cli, ctx, dockerImage, clusterName, i, firstHostPort+i)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}
+
+func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, dockerImage string, clusterName string, nodeNumber int, hostPort int) (string, error) {
 	hostConfig := &container.HostConfig{
 		PortBindings: nat.PortMap{
-			"3306/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: "3306",	},},
+			"3306/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: strconv.Itoa(hostPort),	},},
 		},
+	}
+
+	envVars := []string{
+		"MYSQL_ROOT_PASSWORD=test",
+		"MYSQL_DATABASE=test",
+		"MYSQL_USER=test",
+		"MYSQL_PASSWORD=test",
+		"WSREP_NODE_NAME=node" + strconv.Itoa(nodeNumber),
+		"WSREP_CLUSTER_NAME=galera_cluster",
+		"WSREP_CLUSTER_ADDRESS=gcomm://node1",
+	}
+
+	if 0 == nodeNumber {
+		envVars = append(envVars, "WSREP_NEW_CLUSTER=1")
+	} else {
+		
 	}
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
@@ -56,42 +85,33 @@ func (d *dockerClient) DeployCluster(clusterName string, dbType string, instance
 			nat.Port("3306/tcp"): {},
 			//nat.Port("10001/tcp"): {},
 		},
-		Env: []string{
-			"WSREP_NEW_CLUSTER=1",
-			"MYSQL_ROOT_PASSWORD=test",
-			"MYSQL_DATABASE=test",
-			"MYSQL_USER=test",
-			"MYSQL_PASSWORD=test",
-			"WSREP_NODE_NAME=node1",
-			"WSREP_CLUSTER_NAME=galera_cluster",
-			"WSREP_CLUSTER_ADDRESS=gcomm://node1",
-		},
+		Env: envVars,
 	}, hostConfig, nil, "")
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		return false, err
+		return "", err
 	}
-/*
-	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
-	select {
-	case err := <-errCh:
-		if err != nil {
-			return false, err
+	/*
+		statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+		select {
+		case err := <-errCh:
+			if err != nil {
+				return false, err
+			}
+		case <-statusCh:
 		}
-	case <-statusCh:
-	}
-*/
+	*/
 	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	io.Copy(os.Stdout, out)
 
-	return true, nil
+	return resp.ID, nil
 }
 
 func (d *dockerClient) RemoveCluster(clusterName string) (bool, error) {
