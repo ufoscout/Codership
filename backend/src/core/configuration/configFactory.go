@@ -6,9 +6,9 @@ import (
 )
 
 /*
-Load the configuration from the path folder
+LoadConfig the configuration from the path folder
 */
-func Load(configFile string) Config {
+func LoadConfig(configFile string) Config {
 
 	up, err := go_up.NewGoUp().
 		AddFile(configFile, false).
@@ -22,9 +22,11 @@ func Load(configFile string) Config {
 	var config Config = Config{
 		Server: ServerConfig{
 			Port: up.GetInt("server.port"),
+			ResourcesPath: up.GetString("server.resourcesPath"),
 		},
-		Frontend: FrontendConfig{
-			ResourcesPath: up.GetString("frontend.resourcesPath"),
+		Docker: DockerConfig{
+			MariaDbImage: up.GetString("docker.images.mariadb"),
+			MySqlImage: up.GetString("docker.images.mysql"),
 		},
 	}
 

@@ -9,7 +9,7 @@ import (
 
 /*
 MainFolderPath returns the folder where the main.go file is stored.
-This is useful to access project relative folders from unit tests
+This is used to access project relative folders from unit tests
 */
 func MainFolderPath() string {
 

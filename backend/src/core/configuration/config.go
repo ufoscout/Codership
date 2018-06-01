@@ -1,15 +1,16 @@
 package configuration
 
-// FrontendConfig contains the Frontend configuration
-type FrontendConfig struct {
+type ServerConfig struct {
+	Port int
 	ResourcesPath string
 }
 
-type ServerConfig struct {
-	Port int
+type DockerConfig struct {
+	MariaDbImage string
+	MySqlImage string
 }
 
 type Config struct {
 	Server   ServerConfig
-	Frontend FrontendConfig
+	Docker DockerConfig
 }

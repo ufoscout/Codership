@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	config := configuration.Load(configuration.CONFIG_FILE_NAME)
+	config := configuration.LoadConfig(configuration.CONFIG_FILE_NAME)
 
 	coreModule := core.CoreModule(&config)
 

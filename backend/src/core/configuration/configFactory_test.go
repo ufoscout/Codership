@@ -10,7 +10,8 @@ import (
 )
 
 func Test_load_Unit(t *testing.T) {
-	config := Load(path.Join(util.MainFolderPath(), CONFIG_FILE_NAME))
+	config := LoadConfig(path.Join(util.MainFolderPath(), CONFIG_FILE_NAME))
 	assert.Equal(t, 8080, config.Server.Port)
-	assert.Equal(t, "../front/dist", config.Frontend.ResourcesPath)
+	assert.Equal(t, "../frontend/dist", config.Server.ResourcesPath)
+	assert.Contains(t, config.Docker.MariaDbImage, "maria")
 }

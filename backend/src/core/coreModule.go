@@ -37,8 +37,8 @@ func (c *coreModule) Server() *gin.Engine {
 
 func (c *coreModule) Start() {
 
-	fmt.Printf("Loading static resources from %s\n", c.config.Frontend.ResourcesPath)
-	c.ginRouter.Use(static.Serve("/", static.LocalFile(c.config.Frontend.ResourcesPath, true)))
+	fmt.Printf("Loading static resources from %s\n", c.config.Server.ResourcesPath)
+	c.ginRouter.Use(static.Serve("/", static.LocalFile(c.config.Server.ResourcesPath, true)))
 
 	fmt.Printf("Starting Server at requested port %d\n", c.config.Server.Port)
 
