@@ -4,12 +4,22 @@
 
 set -eo pipefail
 
-# Workaround to skip mysql db initialization.
-# It looks like the only way is to create an empty /var/lib/mysql/mysql directory! 
-# That's completely crazy. it took me hours to figure it out...
-if [ -n "$SKIP_DB_INIT" ]; then
-	echo 'SKIP DB INIT TRUE'
-	mkdir -p /var/lib/mysql/mysql
+CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED"
+if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
+    echo "First container startup"
+    touch $CONTAINER_ALREADY_STARTED
+    if [ -n "$WSREP_NEW_CLUSTER" ]; then
+        echo "New cluster init"
+        set -- "$@" --wsrep-new-cluster
+    else 
+        # Workaround to skip mysql db initialization.
+        # It looks like the only way is to create an empty /var/lib/mysql/mysql directory! 
+        # That's completely crazy. it took me hours to figure it out...
+        echo 'Skip MySql initialization'
+        mkdir -p /var/lib/mysql/mysql
+    fi
+else
+    echo "Not first container startup"
 fi
 
 if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'mysqld' ]; then

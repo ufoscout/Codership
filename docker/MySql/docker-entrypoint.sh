@@ -95,7 +95,12 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
 	# Get config
 	DATADIR="$(_get_config 'datadir' "$@")"
  
-	if [ ! -n "$SKIP_DB_INIT" ]; then
+    echo "PERFORM_MYSQL_DB_INIT = $PERFORM_MYSQL_DB_INIT"
+ 
+	if [ -n "$PERFORM_MYSQL_DB_INIT" ]; then
+	
+        echo 'Initializing database'
+        
 		file_env 'MYSQL_ROOT_PASSWORD'
 		if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" -a -z "$MYSQL_RANDOM_ROOT_PASSWORD" ]; then
 			echo >&2 'error: database is uninitialized and password option is not specified '
@@ -105,9 +110,9 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
 
 		mkdir -p "$DATADIR"
 
-		echo 'Initializing database'
+		#echo 'Initializing database'
 		#"$@" --initialize-insecure
-		echo 'Database initialized'
+		#echo 'Database initialized'
 
 		if command -v mysql_ssl_rsa_setup > /dev/null && [ ! -e "$DATADIR/server-key.pem" ]; then
 			# https://github.com/mysql/mysql-server/blob/23032807537d8dd8ee4ec1c4d40f0633cd4e12f9/packaging/deb-in/extra/mysql-systemd-start#L81-L84

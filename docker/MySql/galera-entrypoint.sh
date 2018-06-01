@@ -4,6 +4,21 @@
 
 set -eo pipefail
 
+CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED"
+if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
+    echo "First container startup"
+    touch $CONTAINER_ALREADY_STARTED
+    if [ -n "$WSREP_NEW_CLUSTER" ]; then
+        echo "New cluster init"
+        #set -- "$@" --wsrep-new-cluster
+        export PERFORM_MYSQL_DB_INIT=1
+    else 
+        echo 'Skip MySql initialization'
+    fi
+else
+    echo "Not first container startup"
+fi
+
 rm -rf /etc/mysql/my.cnf
 touch /etc/mysql/my.cnf
 
