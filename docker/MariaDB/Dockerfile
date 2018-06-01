@@ -13,4 +13,4 @@ RUN chmod +x /galera-entrypoint.sh
 EXPOSE 3306 4444 4567 4567/udp 4568
 
 ENTRYPOINT ["/galera-entrypoint.sh"]
-CMD /wait && mysqld
+CMD ["mysqld"]

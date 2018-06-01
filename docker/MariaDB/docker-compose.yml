@@ -4,7 +4,7 @@ services:
 
   node1:
     image: "ufoscout/galera-mariadb:latest"
-    #build: .
+    build: .
     hostname: node1
     ports:
       - 3306:3306

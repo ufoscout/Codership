@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+/wait
+
 [ "$DEBUG" == 'true' ] && set -x
 
 set -eo pipefail

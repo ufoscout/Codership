@@ -40,4 +40,4 @@ EXPOSE 3306 4444 4567 4567/udp 4568
 ENV MYSQL_INITDB_SKIP_TZINFO 1
 
 ENTRYPOINT ["/galera-entrypoint.sh"]
-CMD /wait && mysqld
+CMD ["mysqld"]
