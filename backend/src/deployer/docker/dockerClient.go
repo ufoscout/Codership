@@ -30,11 +30,15 @@ func NewDockerDeployer(dockerConfig configuration.DockerConfig) common.Deployer 
 func (d *dockerClient) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]string, error) {
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
+	if err != nil {
+		return nil, err
+	}
 
 	dockerImage := d.dockerConfig.MariaDbImage
 	if ("mysql" == dbType) {
 		dockerImage = d.dockerConfig.MySqlImage
 	}
+	fmt.Printf("dockerImage is [%s]\n", dockerImage)
 
 	pull, err := cli.ImagePull(ctx, dockerImage, types.ImagePullOptions{})
 	if err != nil {
@@ -72,7 +76,6 @@ func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, docker
 		"MYSQL_PASSWORD=test",
 		"WSREP_NODE_NAME=" + thisNodeName,
 		"WSREP_CLUSTER_NAME=galera_cluster",
-		"WSREP_CLUSTER_ADDRESS=gcomm://" + firstNodeName,
 	}
 
 	portsMapping := nat.PortMap{
@@ -85,13 +88,13 @@ func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, docker
 
 	if 0 == nodeNumber {
 		envVars = append(envVars, "WSREP_NEW_CLUSTER=1")
+		envVars = append(envVars, "WSREP_NEW_CLUSTER=1")
+		envVars = append(envVars, "WSREP_CLUSTER_ADDRESS=gcomm://")
 	} else {
 		fmt.Printf("Set wait hosts for node %d\n", nodeNumber)
 		envVars = append(envVars, "WAIT_HOSTS=" + firstNodeName + ":3306")
-		//hostConfig = &container.HostConfig{
-		//	PortBindings: portsMapping,
-		//	Links: []string{firstNodeName + ":" + firstNodeName},
-		//}
+		envVars = append(envVars, "WAIT_HOSTS_TIMEOUT=60")
+		envVars = append(envVars, "WSREP_CLUSTER_ADDRESS=gcomm://" + firstNodeName)
 	}
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
