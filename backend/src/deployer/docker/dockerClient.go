@@ -12,9 +12,9 @@ import (
 	"docker.io/go-docker/api/types/container"
 	"io"
 	"os"
-		"github.com/ufoscout/Codership/backend/src/configuration"
+	"github.com/ufoscout/Codership/backend/src/configuration"
+		"github.com/ufoscout/Codership/backend/src/deployer/common"
 	"github.com/docker/go-connections/nat"
-	"github.com/ufoscout/Codership/backend/src/deployer/common"
 )
 
 type dockerClient struct {
@@ -43,6 +43,11 @@ func (d *dockerClient) DeployCluster(clusterName string, dbType string, clusterS
 		io.Copy(os.Stdout, pull)
 	}
 
+	_, err = d.createNetwork(cli, ctx, clusterName)
+	if err != nil {
+		return nil, err
+	}
+
 	ids := []string{}
 	for i := 0; i < clusterSize; i++ {
 		id, err := d.startNode(cli, ctx, dockerImage, clusterName, i, firstHostPort+i)
@@ -56,26 +61,37 @@ func (d *dockerClient) DeployCluster(clusterName string, dbType string, clusterS
 }
 
 func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, dockerImage string, clusterName string, nodeNumber int, hostPort int) (string, error) {
-	hostConfig := &container.HostConfig{
-		PortBindings: nat.PortMap{
-			"3306/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: strconv.Itoa(hostPort),	},},
-		},
-	}
+
+	firstNodeName := clusterName + "-node-0"
+	thisNodeName := clusterName + "-node-" + strconv.Itoa(nodeNumber)
 
 	envVars := []string{
 		"MYSQL_ROOT_PASSWORD=test",
 		"MYSQL_DATABASE=test",
 		"MYSQL_USER=test",
 		"MYSQL_PASSWORD=test",
-		"WSREP_NODE_NAME=node" + strconv.Itoa(nodeNumber),
+		"WSREP_NODE_NAME=" + thisNodeName,
 		"WSREP_CLUSTER_NAME=galera_cluster",
-		"WSREP_CLUSTER_ADDRESS=gcomm://node1",
+		"WSREP_CLUSTER_ADDRESS=gcomm://" + firstNodeName,
+	}
+
+	portsMapping := nat.PortMap{
+		"3306/tcp": []nat.PortBinding{{HostIP: "0.0.0.0", HostPort: strconv.Itoa(hostPort),	},},
+	}
+
+	hostConfig := &container.HostConfig{
+		PortBindings: portsMapping,
 	}
 
 	if 0 == nodeNumber {
 		envVars = append(envVars, "WSREP_NEW_CLUSTER=1")
 	} else {
-		
+		fmt.Printf("Set wait hosts for node %d\n", nodeNumber)
+		envVars = append(envVars, "WAIT_HOSTS=" + firstNodeName + ":3306")
+		//hostConfig = &container.HostConfig{
+		//	PortBindings: portsMapping,
+		//	Links: []string{firstNodeName + ":" + firstNodeName},
+		//}
 	}
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
@@ -86,7 +102,12 @@ func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, docker
 			//nat.Port("10001/tcp"): {},
 		},
 		Env: envVars,
-	}, hostConfig, nil, "")
+	}, hostConfig, nil, thisNodeName)
+	if err != nil {
+		return "", err
+	}
+
+	err = cli.NetworkConnect(ctx, d.networkName(clusterName), resp.ID, nil)
 	if err != nil {
 		return "", err
 	}
@@ -114,7 +135,81 @@ func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, docker
 	return resp.ID, nil
 }
 
+func (d *dockerClient) createNetwork(cli *docker.Client, ctx context.Context, clusterName string) (types.NetworkCreateResponse, error) {
+	return cli.NetworkCreate(ctx, d.networkName(clusterName), types.NetworkCreate{
+		CheckDuplicate: true,
+	})
+}
+
+func (d *dockerClient) networkName(clusterName string) string {
+	return "network-" + clusterName
+}
+
+func (d *dockerClient) ClusterStatus(clusterName string) (map[string]string, error) {
+	ctx := context.Background()
+	cli, err := docker.NewEnvClient()
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := cli.NetworkInspect(ctx, d.networkName(clusterName), types.NetworkInspectOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	result := map[string]string{}
+	for k,_ := range resp.Containers {
+		resp, err := cli.ContainerInspect(ctx, k)
+		if err==nil {
+			result[k] = resp.State.Status
+		}
+	}
+	return result, nil
+}
+
 func (d *dockerClient) RemoveCluster(clusterName string) (bool, error) {
+
+	ctx := context.Background()
+	cli, err := docker.NewEnvClient()
+	if err != nil {
+		return false, err
+	}
+
+	status, err := d.ClusterStatus(clusterName)
+	if err != nil {
+		return false, err
+	}
+
+	for id,_ := range status {
+
+		err = cli.ContainerKill(ctx, id, "")
+		if err != nil {
+			return false, err
+		}
+
+		statusCh, errCh := cli.ContainerWait(ctx, id, container.WaitConditionNotRunning)
+		select {
+		case err := <-errCh:
+			if err != nil {
+				return false, err
+			}
+		case <-statusCh:
+		}
+
+		err = cli.ContainerRemove(ctx, id, types.ContainerRemoveOptions{
+			RemoveVolumes: true,
+		})
+		if err != nil {
+			return false, err
+		}
+
+	}
+
+	err = cli.NetworkRemove(ctx, d.networkName(clusterName))
+	if err != nil {
+		return false, err
+	}
+
 	return true, nil
 }
 
