@@ -17,7 +17,7 @@
                     "dbType": "Database type",
                     "clusterName": "Cluster name",
                     "clusterSize": "Cluster size",
-                    "firstPort": "First node port (be sure that all ports are available)"
+                    "firstHostPort": "First node port (be sure that all ports are available)"
                 }
             }
         }

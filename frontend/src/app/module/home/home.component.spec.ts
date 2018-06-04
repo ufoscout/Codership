@@ -4,6 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HomeModule } from './';
 import { HomeComponent } from './home.component';
 import { NgxsModule } from '@ngxs/store';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe(`HomeComponent`, () => {
 
@@ -12,6 +13,7 @@ describe(`HomeComponent`, () => {
             imports: [
                 HttpClientTestingModule,
                 RouterTestingModule,
+                NgbModule.forRoot(),
                 NgxsModule.forRoot([]),
                 HomeModule,
             ],

@@ -61,30 +61,35 @@
         <form>
             <div class="form-group">
                 <label for="deploymentType">{{ 'home.my_clusters.modal.form.deploymentType' | translate }}</label>
-                <select class="custom-select" id="deploymentType">
-                    <option selected value="docker">Docker</option>
+                <select class="custom-select" id="deploymentType" name="deploymentType"
+                [(ngModel)]="deploymentType" >
+                    <option value="docker">Docker</option>
                     <option value="kubernates">Kubernates</option>
                     <option value="ansible">Ansible</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="dbType">{{ 'home.my_clusters.modal.form.dbType' | translate }}</label>
-                <select class="custom-select" id="dbType">
-                    <option selected value="mariadb">MariaDB</option>
+                <select class="custom-select" id="dbType" name="dbType"
+                [(ngModel)]="model.dbType" >
+                    <option value="mariadb">MariaDB</option>
                     <option value="mysql">MySql</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="clusterName">{{ 'home.my_clusters.modal.form.clusterName' | translate }}</label>
-                <input type="text" class="form-control" id="clusterName" placeholder="{{ 'home.my_clusters.modal.form.clusterName' | translate }}">
+                <input type="text" class="form-control" id="clusterName" name="clusterName" 
+                [(ngModel)]="model.clusterName" placeholder="{{ 'home.my_clusters.modal.form.clusterName' | translate }}">
             </div>
             <div class="form-group">
                 <label for="clusterSize">{{ 'home.my_clusters.modal.form.clusterSize' | translate }}</label>
-                <input type="number" class="form-control" id="clusterSize" placeholder="{{ 'home.my_clusters.modal.form.clusterSize' | translate }}">
+                <input type="number" class="form-control" id="clusterSize" name="clusterSize" 
+                [(ngModel)]="model.clusterSize" placeholder="{{ 'home.my_clusters.modal.form.clusterSize' | translate }}">
             </div>
             <div class="form-group">
-                <label for="port">{{ 'home.my_clusters.modal.form.firstPort' | translate }}</label>
-                <input type="number" class="form-control" id="port" placeholder="{{ 'home.my_clusters.modal.form.firstPort' | translate }}">
+                <label for="firstHostPort">{{ 'home.my_clusters.modal.form.firstHostPort' | translate }}</label>
+                <input type="number" class="form-control" id="firstHostPort" name="firstHostPort" 
+                [(ngModel)]="model.firstHostPort" placeholder="{{ 'home.my_clusters.modal.form.firstHostPort' | translate }}">
                 <small class="form-text text-muted">{{portsText()}}</small>
             </div>
         </form>
