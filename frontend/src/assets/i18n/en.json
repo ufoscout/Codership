@@ -7,7 +7,19 @@
             "title": "My available clusters",
             "description": "Here you can see the list of available clusters and create new ones. In the future you'll be able to do lots of other actions too!",
             "create": "Create new cluster",
-            "delete": "Remove this cluster"
+            "delete": "Remove this cluster",
+            "modal": {
+                "title": "Create new cluster",
+                "close": "Close",
+                "submit": "Submit",
+                "form": {
+                    "deploymentType": "Deployment type",
+                    "dbType": "Database type",
+                    "clusterName": "Cluster name",
+                    "clusterSize": "Cluster size",
+                    "firstPort": "First node port (be sure that all ports are available)"
+                }
+            }
         }
     }
 }

@@ -52,15 +52,45 @@
 
 <ng-template #createModal let-c="close" let-d="dismiss">
     <div class="modal-header">
-        <h4 class="modal-title">Modal title</h4>
+        <h4 class="modal-title">{{ 'home.my_clusters.modal.title' | translate }}</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">
-        <p>One fine body&hellip;</p>
+        <form>
+            <div class="form-group">
+                <label for="deploymentType">{{ 'home.my_clusters.modal.form.deploymentType' | translate }}</label>
+                <select class="custom-select" id="deploymentType">
+                    <option selected value="docker">Docker</option>
+                    <option value="kubernates">Kubernates</option>
+                    <option value="ansible">Ansible</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dbType">{{ 'home.my_clusters.modal.form.dbType' | translate }}</label>
+                <select class="custom-select" id="dbType">
+                    <option selected value="mariadb">MariaDB</option>
+                    <option value="mysql">MySql</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="clusterName">{{ 'home.my_clusters.modal.form.clusterName' | translate }}</label>
+                <input type="text" class="form-control" id="clusterName" placeholder="{{ 'home.my_clusters.modal.form.clusterName' | translate }}">
+            </div>
+            <div class="form-group">
+                <label for="clusterSize">{{ 'home.my_clusters.modal.form.clusterSize' | translate }}</label>
+                <input type="number" class="form-control" id="clusterSize" placeholder="{{ 'home.my_clusters.modal.form.clusterSize' | translate }}">
+            </div>
+            <div class="form-group">
+                <label for="port">{{ 'home.my_clusters.modal.form.firstPort' | translate }}</label>
+                <input type="number" class="form-control" id="port" placeholder="{{ 'home.my_clusters.modal.form.firstPort' | translate }}">
+                <small class="form-text text-muted">{{portsText()}}</small>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">{{ 'home.my_clusters.modal.submit' | translate }}</button>
+        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">{{ 'home.my_clusters.modal.close' | translate }}</button>
     </div>
 </ng-template>

@@ -15,4 +15,8 @@ export class HomeComponent {
     });
   }
 
+  portsText(): string {
+    return ""
+  }
+
 }
