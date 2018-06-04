@@ -1,15 +1,13 @@
 <app-common-header></app-common-header>
 
 <div class="p-top container">
-    
+
     <main role="main">
         <section class="jumbotron text-center rounded box-shadow">
             <div class="container">
                 <h1 class="jumbotron-heading">{{ 'home.my_clusters.title' | translate }}</h1>
                 <p class="lead text-muted">{{ 'home.my_clusters.description' | translate }}</p>
-                <p>
-                    <a href="#" class="btn btn-primary my-2">{{ 'home.my_clusters.create' | translate }}</a>
-                </p>
+                <div (click)="open(createModal)" class="btn btn-primary my-2">{{ 'home.my_clusters.create' | translate }}</div>
             </div>
         </section>
     </main>
@@ -51,3 +49,18 @@
         </small>
     </div>
 </div>
+
+<ng-template #createModal let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Modal title</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>One fine body&hellip;</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
