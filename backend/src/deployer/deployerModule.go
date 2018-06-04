@@ -32,7 +32,7 @@ func DeployerModule(
 	return &deployerModule{
 		dockerConfig: dockerConfig,
 		server: server,
-		web: web.NewRestController(server, &deploymentService),
+		web: web.NewRestController(server, deploymentService),
 	}
 }
 

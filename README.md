@@ -7,9 +7,10 @@ nodejs 8.10
 chrome latest
 docker latest
 
-ports 3306 nad 3307 should be open for integration tests to run (to be fixed to use random ports)
-
-Integration and Unit tests should be executed separately
+ToDo
+ - ports 3306 nad 3307 should be open for integration tests to run (to be fixed to use random ports)
+ - Integration and Unit tests should be executed separately
+ - Do not trust user input. Validate the inputs.
 
 Docker images:
 published in public docker hub as:
