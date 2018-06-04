@@ -8,8 +8,7 @@ import (
 	"golang.org/x/net/context"
 
 	"strconv"
-	"strings"
-	"docker.io/go-docker/api/types/container"
+		"docker.io/go-docker/api/types/container"
 	"io"
 	"os"
 	"github.com/ufoscout/Codership/backend/src/configuration"
@@ -17,17 +16,17 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-type dockerClient struct {
+type dockerDeployer struct {
 	dockerConfig configuration.DockerConfig
 }
 
 func NewDockerDeployer(dockerConfig configuration.DockerConfig) common.Deployer {
-	return &dockerClient{
+	return &dockerDeployer{
 		dockerConfig: dockerConfig,
 	}
 }
 
-func (d *dockerClient) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]string, error) {
+func (d *dockerDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]common.Node, error) {
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 	if err != nil {
@@ -52,19 +51,20 @@ func (d *dockerClient) DeployCluster(clusterName string, dbType string, clusterS
 		return nil, err
 	}
 
-	ids := []string{}
+	nodes := []common.Node{}
 	for i := 0; i < clusterSize; i++ {
-		id, err := d.startNode(cli, ctx, dockerImage, clusterName, i, firstHostPort+i)
+		port := firstHostPort+i
+		id, err := d.startNode(cli, ctx, dockerImage, clusterName, i, port)
 		if err != nil {
 			return nil, err
 		}
-		ids = append(ids, id)
+		nodes = append(nodes, common.NewNode(id, "starting", port))
 	}
 
-	return ids, nil
+	return nodes, nil
 }
 
-func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, dockerImage string, clusterName string, nodeNumber int, hostPort int) (string, error) {
+func (d *dockerDeployer) startNode(cli *docker.Client, ctx context.Context, dockerImage string, clusterName string, nodeNumber int, hostPort int) (string, error) {
 
 	firstNodeName := clusterName + "-node-0"
 	thisNodeName := clusterName + "-node-" + strconv.Itoa(nodeNumber)
@@ -138,17 +138,17 @@ func (d *dockerClient) startNode(cli *docker.Client, ctx context.Context, docker
 	return resp.ID, nil
 }
 
-func (d *dockerClient) createNetwork(cli *docker.Client, ctx context.Context, clusterName string) (types.NetworkCreateResponse, error) {
+func (d *dockerDeployer) createNetwork(cli *docker.Client, ctx context.Context, clusterName string) (types.NetworkCreateResponse, error) {
 	return cli.NetworkCreate(ctx, d.networkName(clusterName), types.NetworkCreate{
 		CheckDuplicate: true,
 	})
 }
 
-func (d *dockerClient) networkName(clusterName string) string {
+func (d *dockerDeployer) networkName(clusterName string) string {
 	return "network-" + clusterName
 }
 
-func (d *dockerClient) ClusterStatus(clusterName string) (map[string]string, error) {
+func (d *dockerDeployer) ClusterStatus(clusterName string) (map[string]string, error) {
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 	if err != nil {
@@ -170,7 +170,7 @@ func (d *dockerClient) ClusterStatus(clusterName string) (map[string]string, err
 	return result, nil
 }
 
-func (d *dockerClient) RemoveCluster(clusterName string) (bool, error) {
+func (d *dockerDeployer) RemoveCluster(clusterName string) (bool, error) {
 
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
@@ -214,115 +214,4 @@ func (d *dockerClient) RemoveCluster(clusterName string) (bool, error) {
 	}
 
 	return true, nil
-}
-
-
-func StartImage() {
-		ctx := context.Background()
-		cli, err := docker.NewEnvClient()
-		if err != nil {
-			panic(err)
-		}
-
-		pull, err := cli.ImagePull(ctx, "alpine:3.6", types.ImagePullOptions{})
-		if err != nil {
-			panic(err)
-		} else {
-			io.Copy(os.Stdout, pull)
-		}
-
-		resp, err := cli.ContainerCreate(ctx, &container.Config{
-			Image: "alpine:3.6",
-			Cmd:   []string{"echo", "hello world"},
-		}, nil, nil, "")
-		if err != nil {
-			panic(err)
-		}
-
-		if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-			panic(err)
-		}
-
-		statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
-		select {
-		case err := <-errCh:
-			if err != nil {
-				panic(err)
-			}
-		case <-statusCh:
-		}
-
-		out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
-		if err != nil {
-			panic(err)
-		}
-
-		io.Copy(os.Stdout, out)
-}
-
-func Images() {
-
-	cli, err := docker.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	//List all images available locally
-	images, err := cli.ImageList(context.Background(), types.ImageListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	htmlOutput := "<html>"
-	for _, image := range images {
-		htmlOutput += image.ID + " | " + strconv.Itoa(int(image.Size)) + "<br/>"
-	}
-	htmlOutput += "</html>"
-	fmt.Println(htmlOutput)
-}
-
-func Containers() {
-
-	cli, err := docker.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	//Retrieve a list of containers
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	//Iterate through all containers and display each container's properties
-	//fmt.Println("Image ID | Repo Tags | Size")
-	htmlOutput := "<html>"
-	for _, container := range containers {
-		htmlOutput += strings.Join(container.Names, ",") + " | " + container.Image + "<br/>"
-	}
-	htmlOutput += "</html>"
-	fmt.Println(htmlOutput)
-}
-
-func Networks() {
-
-	cli, err := docker.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-
-	networks, err := cli.NetworkList(context.Background(), types.NetworkListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	//List all networks
-	htmlOutput := "<html>"
-	//fmt.Println("Network Name | ID")
-	for _, network := range networks {
-		htmlOutput += network.Name + " | " + network.ID + "<br/>"
-	}
-	htmlOutput += "</html>"
-	fmt.Println(htmlOutput)
-
 }

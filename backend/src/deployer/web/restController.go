@@ -2,20 +2,20 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ufoscout/Codership/backend/src/deployer/common"
+			"github.com/ufoscout/Codership/backend/src/deployer/service"
 )
 
 type RestController struct {
 	server *gin.Engine
-	deployer common.Deployer
+	service *service.DeployerService
 }
 
 func NewRestController(
 	server *gin.Engine,
-	deployer common.Deployer) *RestController {
+	service *service.DeployerService) *RestController {
 		return &RestController {
 			server: server,
-			deployer: deployer,
+			service: service,
 		}
 }
 
