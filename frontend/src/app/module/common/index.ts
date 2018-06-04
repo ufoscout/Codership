@@ -19,6 +19,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     HeaderComponent,
   ],
   imports: [
+    HttpClientModule,
     NgCommonModule,
     NgxsModule.forFeature([CommonState]),
     NgbCollapseModule,

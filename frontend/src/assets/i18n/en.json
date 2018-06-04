@@ -1,5 +1,13 @@
 {
     "hello": {
         "world" : "Hello, World!"
+    },
+    "home": {
+        "my_clusters": {
+            "title": "My available clusters",
+            "description": "Here you can see the list of available clusters and create new ones. In the future you'll be able to do lots of other actions too!",
+            "create": "Create new cluster",
+            "delete": "Remove this cluster"
+        }
     }
 }

@@ -2,10 +2,10 @@ import { State, Action, StateContext } from '@ngxs/store';
 import { TranslateService } from '@ngx-translate/core';
 import * as events from './common.events';
 
-export const defaultLanguage = 'it';
+export const defaultLanguage = 'en';
 
 export class CommonStateModel {
-  allLanguages = ['en', 'it'];
+  allLanguages = ['en', 'fi'];
   language = defaultLanguage;
   defaultLanguage = defaultLanguage;
 }

@@ -5,7 +5,7 @@ import { NgxsModule } from '@ngxs/store';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing';
 import { HomeModule } from './module/home';
-import { LoginModule } from './module/login';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -17,7 +17,6 @@ import { LoginModule } from './module/login';
     NgxsModule.forRoot([]),
     AppRoutingModule,
     HomeModule,
-    LoginModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
