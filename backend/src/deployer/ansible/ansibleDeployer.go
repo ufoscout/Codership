@@ -13,7 +13,7 @@ func NewAnsibleDeployer() common.Deployer {
 	return &ansibleDeployer{}
 }
 
-func (k *ansibleDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]common.Node, error) {
+func (k *ansibleDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) (common.Nodes, error) {
 	return nil, errors.New("Ansible deployment not yet implemented")
 }
 

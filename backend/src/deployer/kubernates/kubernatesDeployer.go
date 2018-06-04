@@ -13,7 +13,7 @@ func NewKubernatesDeployer() common.Deployer {
 	return &kubernatesDeployer{}
 }
 
-func (k *kubernatesDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]common.Node, error) {
+func (k *kubernatesDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) (common.Nodes, error) {
 	return nil, errors.New("Kubernates deployment not yet implemented")
 }
 

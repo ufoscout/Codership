@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"io"
 	"bytes"
+	"fmt"
 )
 
 func Test_Get_ShouldUseReturnClusterStatusIfExists(t *testing.T) {
@@ -107,7 +108,7 @@ func Test_Delete_ShouldReturnErrorFromDeployer(t *testing.T) {
 func Test_Post_ShouldCreateNewCluster(t *testing.T) {
 	router := gin.Default()
 	deployer := &MockDeployer{
-		result: []common.Node{
+		result: common.Nodes{
 			common.NewNode("one", "oneStatus", 321),
 			common.NewNode("two", "twoStatus", 123),
 		},
@@ -134,6 +135,8 @@ func Test_Post_ShouldCreateNewCluster(t *testing.T) {
 	assert.Equal(t, "mariadb", deployer.params[1])
 	assert.Equal(t, "3", deployer.params[2])
 	assert.Equal(t, "12345", deployer.params[3])
+
+	fmt.Println("Body is: " + response.Body.String())
 
 	var body []common.Node
 	json.Unmarshal([]byte(response.Body.String()), &body)
@@ -188,7 +191,7 @@ type MockDeployer struct {
 	params []string
 }
 
-func (k *MockDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]common.Node, error) {
+func (k *MockDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) (common.Nodes, error) {
 	k.methodCalled = "deploy"
 	k.params = []string{
 		clusterName,
@@ -199,7 +202,7 @@ func (k *MockDeployer) DeployCluster(clusterName string, dbType string, clusterS
 	if k.err != nil {
 		return nil, k.err
 	}
-	return k.result.([]common.Node), nil
+	return k.result.(common.Nodes), nil
 }
 
 func (k *MockDeployer) RemoveCluster(clusterName string) (bool, error) {

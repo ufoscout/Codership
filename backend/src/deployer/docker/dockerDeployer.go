@@ -26,7 +26,7 @@ func NewDockerDeployer(dockerConfig configuration.DockerConfig) common.Deployer 
 	}
 }
 
-func (d *dockerDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]common.Node, error) {
+func (d *dockerDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) (common.Nodes, error) {
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 	if err != nil {
