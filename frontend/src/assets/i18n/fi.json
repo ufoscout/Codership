@@ -1,5 +1,25 @@
 {
     "hello": {
         "world" : "Hei maailma!"
+    },
+    "home": {
+        "my_clusters": {
+            "title": "Käytettävissä olevat klusterit",
+            "description": "Tässä näet luettelon käytettävissä olevista klustereista ja luodaan uusia. Tulevaisuudessa voit myös tehdä paljon muita toimintoja!",
+            "create": "Luo uusi klusteri",
+            "delete": "Poista tämä klusteri",
+            "modal": {
+                "title": "Luo uusi klusteri",
+                "close": "Kiinni",
+                "submit": "Lähetä",
+                "form": {
+                    "deploymentType": "Käyttöönottotyyppi",
+                    "dbType": "Tietokantatyyppi",
+                    "clusterName": "Klusterin nimi",
+                    "clusterSize": "Klusterin koko",
+                    "firstHostPort": "Ensimmäinen solmuportti (varmista, että kaikki portit ovat käytettävissä)"
+                }
+            }
+        }
     }
 }
