@@ -6,7 +6,7 @@ BUILD_TARGET_FILE=backend
 
 declare -a steps=(
   #"rm -rf ${BUILD_TARGET_PATH}"
-  "vgo test ./..."
+  "GOCACHE=off vgo test ./... -v"
   "vgo build -o ${BUILD_TARGET_PATH}/${BUILD_TARGET_FILE}"
 )
 
