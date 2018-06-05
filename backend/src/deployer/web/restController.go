@@ -8,7 +8,7 @@ import (
 )
 
 type ErrorResponse struct {
-	Error string `json: error`
+	Error string `json:"error"`
 }
 
 type RestController struct {

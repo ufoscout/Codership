@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 import { HeaderComponent } from './header/header.component';
 import { NgxsModule } from '@ngxs/store';
 import { CommonState } from './common.state';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http);
@@ -24,6 +25,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     NgxsModule.forFeature([CommonState]),
     NgbCollapseModule,
     NgbDropdownModule,
+    NgxSpinnerModule,
     RouterModule,
     TranslateModule.forRoot({
       loader: {

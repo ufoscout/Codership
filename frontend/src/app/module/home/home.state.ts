@@ -5,6 +5,8 @@ import { Cluster } from './dto.model';
 import { ClusterService } from './home.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ApplicationRef } from '@angular/core';
 
 export const defaultLanguage = 'en';
 
@@ -18,11 +20,14 @@ export class HomeStateModel {
 })
 export class HomeState {
 
-  constructor(private service: ClusterService) {
+  constructor(private service: ClusterService,
+    private spinner: NgxSpinnerService,
+    private ref: ApplicationRef) {
   }
 
   @Action(events.CreateCluster)
   createCluster({ getState, setState }: StateContext<HomeStateModel>, { payload }: events.CreateCluster) {
+    this.spinner.show();
     return this.service.createCluster(payload.deployerType, payload.dto).pipe(
       tap(nodes => {
         const state = getState();
@@ -30,9 +35,17 @@ export class HomeState {
           ...state,
           clusters: state.clusters.concat( new Cluster(payload.dto.clusterName, payload.deployerType, nodes))
         });
+        this.spinner.hide();
+        this.ref.tick();
       }
       ),
-      catchError(err => of('Error while creating the cluster'))
+      catchError(err => {
+        this.spinner.hide();
+        this.ref.tick();
+        console.info(err);
+        alert(err.error.error)
+        return of('Error while creating the cluster')
+      })
     )
   }
 
