@@ -14,6 +14,7 @@ import (
 	"github.com/ufoscout/Codership/backend/src/configuration"
 		"github.com/ufoscout/Codership/backend/src/deployer/common"
 	"github.com/docker/go-connections/nat"
+	"log"
 )
 
 type dockerDeployer struct {
@@ -27,6 +28,9 @@ func NewDockerDeployer(dockerConfig configuration.DockerConfig) common.Deployer 
 }
 
 func (d *dockerDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) (common.Nodes, error) {
+	log.Printf("Start new cluster deployment. Cluster name: [%s], dbType: [%s], size: [%d], first port: [%d]\n",
+		clusterName, dbType, clusterSize, firstHostPort)
+
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 	if err != nil {
@@ -37,7 +41,7 @@ func (d *dockerDeployer) DeployCluster(clusterName string, dbType string, cluste
 	if ("mysql" == dbType) {
 		dockerImage = d.dockerConfig.MySqlImage
 	}
-	fmt.Printf("dockerImage is [%s]\n", dockerImage)
+	log.Printf("Pull dockerImage [%s]\n", dockerImage)
 
 	pull, err := cli.ImagePull(ctx, dockerImage, types.ImagePullOptions{})
 	if err != nil {
@@ -139,7 +143,9 @@ func (d *dockerDeployer) startNode(cli *docker.Client, ctx context.Context, dock
 }
 
 func (d *dockerDeployer) createNetwork(cli *docker.Client, ctx context.Context, clusterName string) (types.NetworkCreateResponse, error) {
-	return cli.NetworkCreate(ctx, d.networkName(clusterName), types.NetworkCreate{
+	networkName := d.networkName(clusterName)
+	log.Printf("Create network [%s]\n", networkName)
+	return cli.NetworkCreate(ctx, networkName, types.NetworkCreate{
 		CheckDuplicate: true,
 	})
 }
@@ -149,6 +155,8 @@ func (d *dockerDeployer) networkName(clusterName string) string {
 }
 
 func (d *dockerDeployer) ClusterStatus(clusterName string) (map[string]string, error) {
+	log.Printf("Check status of cluster [%s]\n", clusterName)
+
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 	if err != nil {
@@ -171,7 +179,7 @@ func (d *dockerDeployer) ClusterStatus(clusterName string) (map[string]string, e
 }
 
 func (d *dockerDeployer) RemoveCluster(clusterName string) (bool, error) {
-
+	log.Printf("Remove cluster [%s]\n", clusterName)
 	ctx := context.Background()
 	cli, err := docker.NewEnvClient()
 	if err != nil {

@@ -40,7 +40,7 @@ type FakeDeployer struct {
 	name string
 }
 
-func (FakeDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) ([]common.Node, error) {
+func (FakeDeployer) DeployCluster(clusterName string, dbType string, clusterSize int, firstHostPort int) (common.Nodes, error) {
 	return nil, nil
 }
 
