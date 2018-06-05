@@ -9,9 +9,9 @@ type Deployer interface {
 type Nodes []Node
 
 type Node struct {
-	Id string      `json: id`
-	Status string  `json: status`
-	Port int       `json: port`
+	Id string      `json:"id"`
+	Status string  `json:"status"`
+	Port int       `json:"port"`
 }
 
 func NewNode(id string, status string, port int) Node {

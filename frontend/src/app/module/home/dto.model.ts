@@ -14,9 +14,9 @@ export class Cluster {
 }
 
 export class Node {
-	public Id: string;
-	public Status: string;
-	public Port: number;
+	public id: string;
+	public status: string;
+	public port: number;
 }
 
 export class Error {
