@@ -32,7 +32,7 @@ func startDbDeployment(t *testing.T, dbType string) {
 	clusterName := "cluster-1"
 	clusterSize := 2
 	var nodes []common.Node
-	firstPort := 3306
+	firstPort := 12306
 
 	// Create cluster
 	{
