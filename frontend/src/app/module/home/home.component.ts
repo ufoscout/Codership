@@ -5,7 +5,7 @@ import * as obj from '../shared/utils/object.utils'
 import { Select, Store } from '@ngxs/store';
 import { HomeState, HomeStateModel } from './home.state';
 import { Observable } from 'rxjs';
-import { CreateCluster } from './home.events';
+import { CreateCluster, RefreshCluster, DeleteCluster } from './home.events';
 
 @Component({
   selector: 'app-home',
@@ -39,11 +39,17 @@ export class HomeComponent implements OnInit {
 
   refreshCluster(deployerType: string, clusterName: string) {
     console.log(`refresh ${deployerType} [${clusterName}]`)
+    this.store.dispatch([
+      new RefreshCluster({deployerType: deployerType, clusterName: clusterName}),
+    ]);
   }
 
 
   deleteCluster(deployerType: string, clusterName: string) {
-    console.log(`delete ${deployerType} [${clusterName}]`)
+    console.log(`delete ${deployerType} [${clusterName}]`);
+    this.store.dispatch([
+      new DeleteCluster({deployerType: deployerType, clusterName: clusterName}),
+    ]);
   }
 
   portsText(): string {

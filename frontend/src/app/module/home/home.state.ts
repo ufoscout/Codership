@@ -33,7 +33,7 @@ export class HomeState {
         const state = getState();
         setState({
           ...state,
-          clusters: state.clusters.concat( new Cluster(payload.dto.clusterName, payload.deployerType, nodes))
+          clusters: state.clusters.slice().concat( new Cluster(payload.dto.clusterName, payload.deployerType, nodes))
         });
         this.spinner.hide();
         this.ref.tick();
@@ -44,7 +44,69 @@ export class HomeState {
         this.ref.tick();
         console.info(err);
         alert(err.error.error)
-        return of('Error while creating the cluster')
+        return of(err.error.error)
+      })
+    )
+  }
+
+  @Action(events.RefreshCluster)
+  refreshCluster({ getState, setState }: StateContext<HomeStateModel>, { payload }: events.RefreshCluster) {
+    this.spinner.show();
+    return this.service.getClusterStatus(payload.deployerType, payload.clusterName).pipe(
+      tap(nodes => {
+        const state = getState();
+        let clusters = state.clusters.slice();
+        clusters.forEach(cluster => {
+          if (cluster.name === payload.clusterName) {
+            cluster.nodes.forEach(node => {
+              node.status = nodes[node.id];
+            });
+          }
+        });
+        setState({
+          ...state,
+          clusters: clusters
+        });
+        this.spinner.hide();
+        this.ref.tick();
+      }
+      ),
+      catchError(err => {
+        this.spinner.hide();
+        this.ref.tick();
+        console.info(err);
+        alert(err.error.error)
+        return of(err.error.error)
+      })
+    )
+  }
+
+  @Action(events.DeleteCluster)
+  deleteCluster({ getState, setState }: StateContext<HomeStateModel>, { payload }: events.DeleteCluster) {
+    this.spinner.show();
+    return this.service.deleteCluster(payload.deployerType, payload.clusterName).pipe(
+      tap(nodes => {
+        const state = getState();
+        let clusters = state.clusters.slice();
+        for (var i = clusters.length - 1; i >= 0; i--) {
+          if (clusters[i].name === payload.clusterName) { 
+            clusters.splice(i, 1);
+          }
+      }
+        setState({
+          ...state,
+          clusters: clusters
+        });
+        this.spinner.hide();
+        this.ref.tick();
+      }
+      ),
+      catchError(err => {
+        this.spinner.hide();
+        this.ref.tick();
+        console.info(err);
+        alert(err.error.error)
+        return of(err.error.error)
       })
     )
   }

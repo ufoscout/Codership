@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxsModule } from '@ngxs/store';
+import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing';
 import { HomeModule } from './module/home';
@@ -15,6 +16,7 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     NgbModule.forRoot(),
     NgxsModule.forRoot([]),
+    NgxsStoragePluginModule.forRoot(),
     AppRoutingModule,
     HomeModule,
   ],
